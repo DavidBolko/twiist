@@ -2,42 +2,21 @@
 {
     internal class Program
     {
-        static DriveInfo[] drives = DriveInfo.GetDrives();
-        static string[] files = { };
-        static List<DateTime> dates = new List<DateTime>();
-        static private DateTime recent_date;
-
-        static string destination_parent = @"D:/";
-        static string folder_name = @"Test";
-        static string destination_folder = Path.Combine(destination_parent, folder_name);
 
         static void Main()
         {
+            //drive manipulation, searching for files and searching for most recent date
+            SearchEngine SE = new SearchEngine();
+            string drive = SE.DetectDrive();
+            string[] files = SE.FindFiles(drive);
+            DateTime recent_date = SE.RecentDate(files);
 
+            //file manipulation
+            string folder = FileEngine.CreateFolder();
 
-            foreach (DriveInfo drive in drives)
-            {
-                if(drive.IsReady == true && drive.VolumeLabel == "NIKON")
-                {
-                    files = Directory.GetFiles(drive.Name, "*.NEF", SearchOption.AllDirectories);
-                    foreach (string file in files)
-                    {
-                        dates.Add(File.GetCreationTime(file).Date);
-                    }
-                    recent_date = dates.Max();
-                }
-            }
+            Console.WriteLine("Recent Date found: " + recent_date);
 
-            Console.WriteLine(recent_date);
-            Directory.CreateDirectory(destination_folder);
-            foreach(string f in files)
-            {
-                if(File.GetCreationTime(f).Date == recent_date)
-                {
-                    Console.WriteLine(f);
-                    File.Copy(f, @"D://Test/" + Path.GetFileName(f), true);
-                }
-            }
+            FileEngine.CopyFiles(folder, files, recent_date);
         }
     }
 }
