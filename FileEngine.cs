@@ -25,21 +25,25 @@ namespace twiist
 
         public static void CopyFiles(string folder_name, string[] files, DateTime recent_date)
         {
+            GUI gui = new GUI();
             string destination_folder = Path.Combine(destination_parent, folder_name);
             var totalSize = GetTotalFileSize(files, recent_date);
-            //Console.WriteLine("[" + GUI.ProgressBar + "]");
-            decimal processed = 0;
+            float processed = 0;
             foreach (string f in files)
             {
                 if (File.GetCreationTime(f).Date == recent_date)
                 {
-                    //Console.SetCursorPosition(0, Console.CursorTop);
                     processed += new FileInfo(f).Length / 1024 / 1024;
-                    Console.WriteLine(decimal.Round(processed, 2) + "/" + totalSize + "MB");
+                    Console.SetCursorPosition(0, 2);
+                    Console.Write(Math.Round(processed, 2) + "/" + totalSize + "MB");
+                    Console.SetCursorPosition(0, 1);
+                    gui.ProgressBar(totalSize, processed);
                     File.Copy(f, (destination_folder + "/" + Path.GetFileName(f)), true);
                 }
             }
+            Console.SetCursorPosition(0, 2);
             Console.WriteLine(totalSize + "/" + totalSize + "MB");
+            Console.SetCursorPosition(0, 3);
             Console.WriteLine("DONE!");
         }
 
